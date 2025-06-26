@@ -7,7 +7,7 @@ import { HighlightMaterial } from '../materials/HighlightMaterial';
 import { useControls, folder, button } from 'leva'
 
 export default function AnimatedFemale({ ref, ...props }) {
-    const { nodes, scene, animations } = useGLTF(process.env.PUBLIC_URL + '/assets/models/AnimationTest8.glb');
+    const { nodes, scene, animations } = useGLTF(process.env.PUBLIC_URL + '/assets/models/female.glb');
     const { actions } = useAnimations(animations, scene);
     const glowMat = GlowMaterial({ glowColor: new THREE.Color(0xffffff), c: 0.8, p: 2 });
 
