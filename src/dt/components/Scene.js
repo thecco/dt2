@@ -1,6 +1,6 @@
 import { Suspense, useRef } from 'react'
 import { Canvas } from "@react-three/fiber"
-import { Environment, PresentationControls, Html, MeshReflectorMaterial } from '@react-three/drei';
+import { Environment, PresentationControls, Html, MeshReflectorMaterial, RandomizedLight, AccumulativeShadows } from '@react-three/drei';
 import Female from './models/Female';
 import AnimatedFemale from './models/AnimatedFemale';
 import { Stage } from './Stage';
@@ -11,7 +11,6 @@ export function Scene() {
     return (
         <div style={{ width: '100%', height: '100%' }}>
             <Canvas shadows dpr={[1, 2]} camera={{ position: [0, 0, 5], fov: 20 }} style={{ touchAction: 'none', width: '100%', height: '100%' }}>
-                <fog attach="fog" args={['lightpink', 8, 20]} />
                 <Suspense fallback={null}>
                     <Stage>
                         <PresentationControls
@@ -23,6 +22,10 @@ export function Scene() {
 
                             <AnimatedFemale ref={modelRef} />
                             {/* <Female ref={modelRef} /> */}
+
+                            <AccumulativeShadows temporal frames={100} scale={1} alphaTest={0.8} position={[0, 0.04, 0]}>
+                                <RandomizedLight amount={8} radius={10} ambient={0.5} position={[2.5, 5, -5]} bias={0.001} />
+                            </AccumulativeShadows>
                         </PresentationControls>
                     </Stage>
 
@@ -44,10 +47,11 @@ export function Scene() {
                     <pointLight position={[-10, -10, -10]} color="white" intensity={3} />
                     <pointLight position={[0, -5, 5]} intensity={0.5} />
                     <directionalLight position={[0, -5, 0]} color="white" intensity={2} />
-                    <Environment preset="warehouse" />
+                    <Environment preset="sunset" background backgroundBlurriness={1} />
+                    <fog attach="fog" args={['#a3b2c8', 8, 10]} />
                     <mesh
                         position={[0, 0, 0]}
-                        scale={[0.5, 0.5, 0.5]}
+                        scale={[0.1, 0.1, 0.1]}
                         rotation={[-Math.PI / 2, 0, Math.PI]}
                         receiveShadow  >
                         <planeGeometry args={[70, 70]} />
