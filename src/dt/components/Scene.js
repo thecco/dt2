@@ -1,0 +1,53 @@
+import { Suspense, useRef } from 'react'
+import { Canvas } from "@react-three/fiber"
+import { Environment, PresentationControls, Html } from '@react-three/drei';
+import Female from './models/Female';
+import AnimatedFemale from './models/AnimatedFemale';
+import { Stage } from './Stage';
+
+export function Scene() {
+	const modelRef = useRef();
+
+	return (
+		<div style={{ width: '100%', height: '100%' }}>
+			<Canvas shadows dpr={[1, 2]} camera={{ position: [0, 0, 5], fov: 20 }} style={{ touchAction: 'none', width: '100%', height: '100%' }}>
+				<fog attach="fog" args={['lightpink', 60, 100]} />
+				<Suspense fallback={null}>
+
+					<Stage>
+						<PresentationControls
+							global
+							speed={2.5}
+							polar={[0, 0]}
+							config={{ mass: 2, tension: 400 }}
+							snap={false}>
+
+							<AnimatedFemale ref={modelRef} />
+							{/* <Female ref={modelRef} /> */}
+						</PresentationControls>
+					</Stage>
+
+					<Html scale={0.1} position={[0.3, 1.3, 1]} transform occlude>
+						<div className="annotation">
+							심장  <span style={{ color: 'red' }}>32.6</span> <span style={{ fontSize: '1.5em' }}>😮</span>
+						</div>
+					</Html>
+
+					<Html scale={0.1} position={[-0.35, 0.8, 1]} transform occlude>
+						<div className="annotation">
+							대장  <span style={{ color: 'lime' }}>87.3</span> <span style={{ fontSize: '1.5em' }}>😊</span>
+						</div>
+					</Html>
+
+
+					<ambientLight intensity={0.5} />
+					<spotLight position={[50, 50, -30]} castShadow />
+					<pointLight position={[-10, -10, -10]} color="red" intensity={3} />
+					<pointLight position={[0, -5, 5]} intensity={0.5} />
+					<directionalLight position={[0, -5, 0]} color="red" intensity={2} />
+					<Environment preset="warehouse" />
+				</Suspense>
+			</Canvas>
+		</div>
+	);
+}
