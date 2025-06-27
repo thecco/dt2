@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { useMemo, useEffect } from 'react';
-import { useGLTF, useAnimations, Wireframe } from "@react-three/drei"
+import { useGLTF, useAnimations } from "@react-three/drei"
 import { GlowMaterial } from '../materials/GlowMaterial';
 // import { ColorMaterial } from '../materials/ColorMaterial';
 import { HighlightMaterial } from '../materials/HighlightMaterial';
@@ -11,49 +11,14 @@ export default function AnimatedFemale({ ref, ...props }) {
     const { actions } = useAnimations(animations, scene);
     const glowMat = GlowMaterial({ glowColor: new THREE.Color(0xffffff), c: 0.8, p: 2 });
 
-    const [materialProps, setMaterialProps] = useControls(() => ({
-        'Material': folder({
-            '투명': button(() => {
-                setMaterialProps({
-                    color: '#939393',
-                    roughness: 1,
-                    clearcoat: 0,
-                    opacity: 0.2,
-                });
-            }),
-            '반투명+유리': button(() => {
-                setMaterialProps({
-                    color: '#939393',
-                    roughness: 0,
-                    clearcoat: 1,
-                    opacity: 0.5,
-                });
-            }),
-            '불투명+유리': button(() => {
-                setMaterialProps({
-                    color: '#939393',
-                    roughness: 0,
-                    clearcoat: 1,
-                    opacity: 1,
-                });
-            }),
-        }, { collapsed: false }),
-        'Manual Controls': folder({
-            color: '#939393',
-            roughness: { value: 1, min: 0, max: 1.0 },
-            opacity: { value: 0.3, min: 0, max: 1.0 },
-            clearcoat: { value: 0, min: 0, max: 1.0 },
-            flatShading: { value: false },
-            wireframe: { value: false }
-        })
-    }));
-
     const transparentMat = useMemo(() => new THREE.MeshPhysicalMaterial({
         color: new THREE.Color('#939393'),
-        iridescence: 1,
         roughness: 1,
-        opacity: 0.3,
         clearcoat: 0,
+        opacity: 0.2,
+        iridescence: 1,
+        flatShading: false,
+        wireframe: false,
         depthWrite: true,
         depthTest: true,
         transparent: true,
@@ -82,43 +47,87 @@ export default function AnimatedFemale({ ref, ...props }) {
         alpha: 0.4,
     }), [nodes.body]);
 
+    const [materialProps, setMaterialProps] = useControls(() => ({
+        'Manual Controls': folder({
+            color: '#939393',
+            roughness: { value: 1, min: 0, max: 1.0 },
+            opacity: { value: 0.3, min: 0, max: 1.0 },
+            clearcoat: { value: 0, min: 0, max: 1.0 },
+            flatShading: false,
+            wireframe: false,
+        }, { collapsed: false })
+    }));
+
+    useControls(() => ({
+        'Material': folder({
+            '투명': button(() => {
+                setMaterialProps({
+                    color: '#939393',
+                    roughness: 1,
+                    clearcoat: 0,
+                    opacity: 0.2,
+                });
+            }),
+            '반투명+유리': button(() => {
+                setMaterialProps({
+                    color: '#939393',
+                    roughness: 0,
+                    clearcoat: 1,
+                    opacity: 0.5,
+                });
+            }),
+            '불투명+유리': button(() => {
+                setMaterialProps({
+                    color: '#939393',
+                    roughness: 0,
+                    clearcoat: 1,
+                    opacity: 1,
+                });
+            }),
+        }, { collapsed: false }),
+    }));
+
     useEffect(() => {
         if (transparentMat) {
-            for (const key in materialProps) {
-                const value = materialProps[key];
-                if (key === 'color') {
-                    transparentMat.color.set(value);
-                } else {
-                    transparentMat[key] = value;
-                }
-            }
+
+            transparentMat.color.set(materialProps.color);
+            transparentMat.roughness = materialProps.roughness;
+            transparentMat.opacity = materialProps.opacity;
+            transparentMat.clearcoat = materialProps.clearcoat;
+            transparentMat.flatShading = materialProps.flatShading;
+            transparentMat.wireframe = materialProps.wireframe;
+
             transparentMat.needsUpdate = true;
         }
     }, [materialProps, transparentMat]);
 
     useEffect(() => {
+        console.log('1');
         actions['idle1']?.reset().setLoop(THREE.LoopRepeat).play();
     }, [actions]);
 
     useEffect(() => {
-        const mesh = nodes.body
-        const boneParent = mesh.parent
-        if (!boneParent || scene.getObjectByName('overlay_0')) return
+        if (!nodes || !nodes.body.parent) return;
+        const mesh = nodes.body;
+        const boneParent = mesh.parent;
+
+        if (scene.getObjectByName('overlay_0')) return
 
         mesh.material = transparentMat;
         mesh.renderOrder = 0;
 
         const overlays = [glowMat, heartMat, stomachMat].map((mat, i) => {
-            const overlay = new THREE.SkinnedMesh(mesh.geometry, mat)
-            overlay.bind(mesh.skeleton, mesh.bindMatrix.clone())
-            overlay.name = `overlay_${i}`
+            const overlay = new THREE.SkinnedMesh(mesh.geometry, mat);
+
+            overlay.bind(mesh.skeleton, mesh.bindMatrix.clone());
+            overlay.name = `overlay_${i}`;
             overlay.renderOrder = 1;
-            return overlay
+
+            return overlay;
         })
 
-        overlays.forEach(overlay => boneParent.add(overlay))
+        overlays.forEach(overlay => boneParent.add(overlay));
     }, [nodes, scene, glowMat, heartMat, stomachMat, transparentMat])
-
 
     return (
         <group {...props} dispose={null}>
