@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { useMemo, useEffect, useState } from 'react';
+import { useMemo, useEffect, useState, useLayoutEffect } from 'react';
 import { useGLTF, useAnimations } from "@react-three/drei"
 import { GlowMaterial } from '../materials/GlowMaterial';
 // import { ColorMaterial } from '../materials/ColorMaterial';
@@ -103,23 +103,27 @@ export default function AnimatedFemale({ ref, ...props }) {
     }, [materialProps, transparentMat]);
 
     useEffect(() => {
+        console.log('1');
         actions['idle1']?.reset().setLoop(THREE.LoopRepeat).play();
     }, [actions]);
 
-    useEffect(() => {
-        if (!nodes || !nodes.body.parent) return;
+    const patchedScene = useMemo(() => {
+        if (!nodes || !nodes.body.parent) return scene;
         const mesh = nodes.body;
         const boneParent = mesh.parent;
 
-        if (scene.getObjectByName('overlay_0')) return
+        if (scene.getObjectByName('overlay_0')) return scene;
 
+        mesh.material?.dispose();
         mesh.material = transparentMat;
         mesh.renderOrder = 0;
+
+        const matrix = mesh.bindMatrix.clone();
 
         const overlays = [glowMat, heartMat, stomachMat].map((mat, i) => {
             const overlay = new THREE.SkinnedMesh(mesh.geometry, mat);
 
-            overlay.bind(mesh.skeleton, mesh.bindMatrix.clone());
+            overlay.bind(mesh.skeleton, matrix);
             overlay.name = `overlay_${i}`;
             overlay.renderOrder = 1;
 
@@ -129,11 +133,13 @@ export default function AnimatedFemale({ ref, ...props }) {
         overlays.forEach(overlay => boneParent.add(overlay));
         transparentMat.needsUpdate = true;
 
+        return scene;
+
     }, [nodes, scene, glowMat, heartMat, stomachMat, transparentMat])
 
     return (
         <group {...props} dispose={null}>
-            <primitive castShadow receiveShadow object={scene} ref={ref} />
+            <primitive castShadow receiveShadow object={patchedScene} ref={ref} dispose={null} />
         </group>
     );
 }
