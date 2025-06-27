@@ -1,10 +1,11 @@
 import * as THREE from 'three';
-import { useMemo, useEffect } from 'react';
+import { useMemo, useEffect, useState } from 'react';
 import { useGLTF, useAnimations } from "@react-three/drei"
 import { GlowMaterial } from '../materials/GlowMaterial';
 // import { ColorMaterial } from '../materials/ColorMaterial';
 import { HighlightMaterial } from '../materials/HighlightMaterial';
 import { useControls, folder, button } from 'leva'
+import { useThree } from '@react-three/fiber';
 
 export default function AnimatedFemale({ ref, ...props }) {
     const { nodes, scene, animations } = useGLTF(process.env.PUBLIC_URL + '/assets/models/female.glb');
@@ -102,7 +103,6 @@ export default function AnimatedFemale({ ref, ...props }) {
     }, [materialProps, transparentMat]);
 
     useEffect(() => {
-        console.log('1');
         actions['idle1']?.reset().setLoop(THREE.LoopRepeat).play();
     }, [actions]);
 
@@ -127,6 +127,8 @@ export default function AnimatedFemale({ ref, ...props }) {
         })
 
         overlays.forEach(overlay => boneParent.add(overlay));
+        transparentMat.needsUpdate = true;
+
     }, [nodes, scene, glowMat, heartMat, stomachMat, transparentMat])
 
     return (
