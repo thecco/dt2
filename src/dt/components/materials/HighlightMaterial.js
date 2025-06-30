@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 
 export function HighlightMaterial({ mesh, baseColor = new THREE.Color(0xc0a2f5), alpha = 0.4, xMin, xMax, yMin, yMax, softness } = {}) {
-    const material = new THREE.MeshStandardMaterial({
+    const material = new THREE.MeshBasicMaterial({
         color: 0xffffff,
         transparent: true,
         side: THREE.DoubleSide,

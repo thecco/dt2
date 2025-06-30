@@ -1,17 +1,16 @@
 import * as THREE from 'three';
-import { useMemo, useEffect, useState, useLayoutEffect } from 'react';
-import { useGLTF, useAnimations } from "@react-three/drei"
+import { useMemo, useEffect, useState, useLayoutEffect, useRef } from 'react';
+import { useGLTF, useAnimations, Html } from "@react-three/drei"
 import { GlowMaterial } from '../materials/GlowMaterial';
-// import { ColorMaterial } from '../materials/ColorMaterial';
 import { HighlightMaterial } from '../materials/HighlightMaterial';
 import { useControls, folder, button } from 'leva'
-import { useThree } from '@react-three/fiber';
+import Billboard from '../Billboard';
 
 export default function AnimatedFemale({ ref, ...props }) {
     const { nodes, scene, animations } = useGLTF(process.env.PUBLIC_URL + '/assets/models/female.glb');
     const { actions } = useAnimations(animations, scene);
-    const glowMat = GlowMaterial({ glowColor: new THREE.Color(0xffffff), c: 0.8, p: 2 });
 
+    //#region Materials
     const transparentMat = useMemo(() => new THREE.MeshPhysicalMaterial({
         color: new THREE.Color('#939393'),
         roughness: 1,
@@ -25,6 +24,9 @@ export default function AnimatedFemale({ ref, ...props }) {
         transparent: true,
         side: THREE.FrontSide,
     }), []);
+
+    // eslint-disable-next-line
+    const glowMat = useMemo(() => GlowMaterial({ glowColor: new THREE.Color(0xffffff), c: 0.8, p: 2 }));
 
     const heartMat = useMemo(() => new HighlightMaterial({
         mesh: nodes.body,
@@ -58,7 +60,9 @@ export default function AnimatedFemale({ ref, ...props }) {
             wireframe: false,
         }, { collapsed: false })
     }));
+    //#endregion
 
+    //#region Leva
     useControls(() => ({
         'Material': folder({
             '투명': button(() => {
@@ -90,7 +94,6 @@ export default function AnimatedFemale({ ref, ...props }) {
 
     useEffect(() => {
         if (transparentMat) {
-
             transparentMat.color.set(materialProps.color);
             transparentMat.roughness = materialProps.roughness;
             transparentMat.opacity = materialProps.opacity;
@@ -101,24 +104,20 @@ export default function AnimatedFemale({ ref, ...props }) {
             transparentMat.needsUpdate = true;
         }
     }, [materialProps, transparentMat]);
+    //#endregion
 
     useEffect(() => {
-        console.log('1');
         actions['idle1']?.reset().setLoop(THREE.LoopRepeat).play();
     }, [actions]);
 
-    const patchedScene = useMemo(() => {
-        if (!nodes || !nodes.body.parent) return scene;
+    useLayoutEffect(() => {
+        if (!nodes || !nodes.body || !nodes.body.parent || scene.getObjectByName('overlay_0')) return;
         const mesh = nodes.body;
-        const boneParent = mesh.parent;
-
-        if (scene.getObjectByName('overlay_0')) return scene;
+        const matrix = mesh.bindMatrix.clone();
 
         mesh.material?.dispose();
         mesh.material = transparentMat;
         mesh.renderOrder = 0;
-
-        const matrix = mesh.bindMatrix.clone();
 
         const overlays = [glowMat, heartMat, stomachMat].map((mat, i) => {
             const overlay = new THREE.SkinnedMesh(mesh.geometry, mat);
@@ -130,16 +129,28 @@ export default function AnimatedFemale({ ref, ...props }) {
             return overlay;
         })
 
-        overlays.forEach(overlay => boneParent.add(overlay));
-        transparentMat.needsUpdate = true;
+        overlays.forEach(overlay => mesh.parent.add(overlay));
 
-        return scene;
-
-    }, [nodes, scene, glowMat, heartMat, stomachMat, transparentMat])
+        console.log(scene);
+        // eslint-disable-next-line
+    }, [nodes]);
 
     return (
         <group {...props} dispose={null}>
-            <primitive castShadow receiveShadow object={patchedScene} ref={ref} dispose={null} />
+            <primitive object={nodes.body.parent.parent} ref={ref} dispose={null} />
+
+            <Billboard scene={scene} boneName="mixamorigLeftHand" offset={[0, 0.1, 0]}>
+                <Html center>
+                    <div style={{
+                        width: '20px',
+                        height: '20px',
+                        borderRadius: '50%',
+                        background: 'red',
+                    }} />
+                </Html>
+            </Billboard>
         </group>
     );
 }
+
+useGLTF.preload(process.env.PUBLIC_URL + '/assets/models/female.glb');

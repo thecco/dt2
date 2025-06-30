@@ -1,7 +1,6 @@
 import { Suspense, useRef } from 'react'
 import { Canvas } from "@react-three/fiber"
-import { Environment, PresentationControls, Html, MeshReflectorMaterial, RandomizedLight, AccumulativeShadows } from '@react-three/drei';
-import Female from './models/Female';
+import { Environment, PresentationControls, MeshReflectorMaterial, RandomizedLight, AccumulativeShadows, Stats } from '@react-three/drei';
 import AnimatedFemale from './models/AnimatedFemale';
 import { Stage } from './Stage';
 
@@ -21,26 +20,12 @@ export function Scene() {
                             snap={false}>
 
                             <AnimatedFemale ref={modelRef} />
-                            {/* <Female ref={modelRef} /> */}
 
                             <AccumulativeShadows temporal frames={100} scale={1} alphaTest={0.8} position={[0, 0.04, 0]}>
                                 <RandomizedLight amount={8} radius={10} ambient={0.5} position={[2.5, 5, -5]} bias={0.001} />
                             </AccumulativeShadows>
                         </PresentationControls>
                     </Stage>
-
-                    <Html scale={0.1} position={[0.3, 1.3, 1]} transform occlude>
-                        <div className="annotation">
-                            심장  <span style={{ color: 'red' }}>32.6</span> <span style={{ fontSize: '1.5em' }}>😮</span>
-                        </div>
-                    </Html>
-
-                    <Html scale={0.1} position={[-0.35, 0.8, 1]} transform occlude>
-                        <div className="annotation">
-                            대장  <span style={{ color: 'lime' }}>87.3</span> <span style={{ fontSize: '1.5em' }}>😊</span>
-                        </div>
-                    </Html>
-
 
                     <ambientLight intensity={0.5} />
                     <spotLight position={[50, 50, -30]} castShadow />
@@ -67,6 +52,7 @@ export function Scene() {
                             roughness={1} />
                     </mesh>
                 </Suspense>
+                <Stats className="stats" />
             </Canvas>
         </div>
     );

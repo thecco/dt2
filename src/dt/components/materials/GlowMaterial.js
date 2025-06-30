@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 
 export function GlowMaterial({ glowColor = new THREE.Color(0x00ffff), c = 1.0, p = 2.7 }) {
-    const material = new THREE.MeshStandardMaterial({
+    const material = new THREE.MeshBasicMaterial({
         transparent: true,
         blending: THREE.AdditiveBlending,
         depthWrite: false,
