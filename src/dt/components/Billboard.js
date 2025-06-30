@@ -1,21 +1,24 @@
 import { useRef, useLayoutEffect, useMemo } from 'react';
-import { useGLTF } from '@react-three/drei';
+import { Html } from '@react-three/drei';
 
 export default function Billboard({ scene, boneName, offset = [0, 0, 0], children }) {
     const groupRef = useRef();
+    // eslint-disable-next-line
     const bone = useMemo(() => scene.getObjectByName(boneName), [boneName]);
 
     useLayoutEffect(() => {
-        if (bone && groupRef.current) {
-            bone.add(groupRef.current);
-            groupRef.current.position.set(...offset);
+        const currentGroup = groupRef.current;
+
+        if (bone && currentGroup) {
+            bone.add(currentGroup);
+            currentGroup.position.set(...offset);
 
             return () => {
-                bone.remove(groupRef.current);
+                bone.remove(currentGroup);
             };
         }
-    }, [bone, offset]);
+        // eslint-disable-next-line
+    }, [offset]);
 
-    // bone이 있을 때만 렌더링
-    return bone ? <group ref={groupRef}>{children}</group> : null;
+    return bone ? <group ref={groupRef}><Html center>{children}</Html></group> : null;
 }

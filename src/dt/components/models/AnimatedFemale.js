@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { useMemo, useEffect, useState, useLayoutEffect, useRef } from 'react';
-import { useGLTF, useAnimations, Html } from "@react-three/drei"
+import { useGLTF, useAnimations } from "@react-three/drei"
 import { GlowMaterial } from '../materials/GlowMaterial';
 import { HighlightMaterial } from '../materials/HighlightMaterial';
 import { useControls, folder, button } from 'leva'
@@ -131,23 +131,53 @@ export default function AnimatedFemale({ ref, ...props }) {
 
         overlays.forEach(overlay => mesh.parent.add(overlay));
 
-        console.log(scene);
+        return () => {
+            overlays.forEach(overlay => mesh.parent.remove(overlay));
+
+            transparentMat.dispose();
+            glowMat.dispose();
+            heartMat.dispose();
+            stomachMat.dispose();
+
+            mesh.geometry.dispose();
+
+            console.log('All component resources (geometry, materials, overlays) have been disposed.');
+        };
+
         // eslint-disable-next-line
     }, [nodes]);
 
+    useEffect(() => {
+        if (!scene) return;
+
+        console.log("--- 모델의 모든 뼈(Bone) 이름 목록 ---");
+
+        scene.traverse((object) => {
+            if (object.isBone) {
+                console.log(object.name);
+            }
+        });
+        console.log("------------------------------------");
+
+    }, [scene]);
+
+
+    //#region Handlers
+    function onButtonClick(name) {
+        console.log(`Button clicked: ${name}`);
+    }
+    //#endregion
+
     return (
         <group {...props} dispose={null}>
-            <primitive object={nodes.body.parent.parent} ref={ref} dispose={null} />
+            <primitive object={scene} ref={ref} dispose={null} />
 
-            <Billboard scene={scene} boneName="mixamorigLeftHand" offset={[0, 0.1, 0]}>
-                <Html center>
-                    <div style={{
-                        width: '20px',
-                        height: '20px',
-                        borderRadius: '50%',
-                        background: 'red',
-                    }} />
-                </Html>
+            <Billboard scene={scene} boneName="mixamorigSpine2" offset={[6, 0.1, 5]}>
+                <button className="annotation-button" onClick={() => onButtonClick('심장')}>+</button>
+            </Billboard>
+
+            <Billboard scene={scene} boneName="mixamorigSpine" offset={[0, -3, 5]}>
+                <button className="annotation-button" onClick={() => onButtonClick('대장')}>+</button>
             </Billboard>
         </group>
     );
