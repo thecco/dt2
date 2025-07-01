@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { useMemo, useEffect, useState, useLayoutEffect, useRef } from 'react';
+import { useState, useMemo, useEffect, useLayoutEffect, useRef } from 'react';
 import { useGLTF, useAnimations } from "@react-three/drei"
 import { GlowMaterial } from '../materials/GlowMaterial';
 import { HighlightMaterial } from '../materials/HighlightMaterial';
@@ -49,20 +49,20 @@ export default function AnimatedFemale({ ref, ...props }) {
         softness: 0.12,
         alpha: 0.4,
     }), [nodes.body]);
+    //#endregion
 
+    //#region Leva
     const [materialProps, setMaterialProps] = useControls(() => ({
         'Manual Controls': folder({
             color: '#939393',
             roughness: { value: 1, min: 0, max: 1.0 },
-            opacity: { value: 0.3, min: 0, max: 1.0 },
+            opacity: { value: 0.2, min: 0, max: 1.0 },
             clearcoat: { value: 0, min: 0, max: 1.0 },
             flatShading: false,
             wireframe: false,
         }, { collapsed: false })
     }));
-    //#endregion
 
-    //#region Leva
     useControls(() => ({
         'Material': folder({
             '투명': button(() => {
@@ -107,7 +107,12 @@ export default function AnimatedFemale({ ref, ...props }) {
     //#endregion
 
     useEffect(() => {
-        actions['idle1']?.reset().setLoop(THREE.LoopRepeat).play();
+        const idleAction = actions['idle1'];
+
+        if (idleAction) {
+            idleAction.timeScale = 0.7;
+            idleAction.reset().setLoop(THREE.LoopRepeat).play();
+        }
     }, [actions]);
 
     useLayoutEffect(() => {
@@ -140,27 +145,24 @@ export default function AnimatedFemale({ ref, ...props }) {
             stomachMat.dispose();
 
             mesh.geometry.dispose();
-
-            console.log('All component resources (geometry, materials, overlays) have been disposed.');
         };
 
         // eslint-disable-next-line
     }, [nodes]);
 
-    useEffect(() => {
-        if (!scene) return;
+    // useEffect(() => {
+    //     if (!scene) return;
 
-        console.log("--- 모델의 모든 뼈(Bone) 이름 목록 ---");
+    //     console.log("--- 모델의 모든 뼈(Bone) 이름 목록 ---");
 
-        scene.traverse((object) => {
-            if (object.isBone) {
-                console.log(object.name);
-            }
-        });
-        console.log("------------------------------------");
+    //     scene.traverse((object) => {
+    //         if (object.isBone) {
+    //             console.log(object.name);
+    //         }
+    //     });
+    //     console.log("------------------------------------");
 
-    }, [scene]);
-
+    // }, [scene]);
 
     //#region Handlers
     function onButtonClick(name) {
@@ -173,11 +175,15 @@ export default function AnimatedFemale({ ref, ...props }) {
             <primitive object={scene} ref={ref} dispose={null} />
 
             <Billboard scene={scene} boneName="mixamorigSpine2" offset={[6, 0.1, 5]}>
-                <button className="annotation-button" onClick={() => onButtonClick('심장')}>+</button>
+                <button className="annotation-button" onClick={() => onButtonClick('심장')}></button>
             </Billboard>
 
             <Billboard scene={scene} boneName="mixamorigSpine" offset={[0, -3, 5]}>
-                <button className="annotation-button" onClick={() => onButtonClick('대장')}>+</button>
+                <button className="annotation-button" onClick={() => onButtonClick('대장')}></button>
+            </Billboard>
+
+            <Billboard scene={scene} boneName="mixamorigHeadTop_End" offset={[10, -3, 5]}>
+                <button className="annotation-button" onClick={() => onButtonClick('뇌')}></button>
             </Billboard>
         </group>
     );

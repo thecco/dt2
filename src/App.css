@@ -23,28 +23,37 @@ body {
     overflow: hidden;
     overscroll-behavior-y: none;
     /* background: #d4c9d4; */
-    background: #a9b7cd;
+    /* background: #a9b7cd; */
+}
+
+.outlineText {
+    font-weight: bold;
+    font-size: 16px;;
+    text-shadow: 
+    -1px -1px 0 #969696bb,  
+     1px -1px 0 #969696bb,
+    -1px  1px 0 #969696bb,
+     1px  1px 0 #969696bb;
 }
 
 .annotation {
-    cursor: pointer;
-    outline: none;
+     outline: none;
     font-size: 12px;
-    letter-spacing: 1px;
-    display: flex;
+    display: inline-flex;
     justify-content: center;
     align-items: center;
+    white-space: nowrap;
     gap: 5px;
     font-weight: bold;
-    padding: 2px 10px;
+    padding: 2px 12px;
     color: black;
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.5));
     -webkit-backdrop-filter: blur(12px);
     backdrop-filter: blur(12px);
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 20px;
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1),
-        inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    box-shadow: 0 4px 24px 0 rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.295);
 }
 
 .annotation-button {
@@ -58,14 +67,14 @@ body {
     cursor: pointer;
     outline: none;
     color: black;
+        font-size: 14px;
+    font-weight: bold;
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.5));
     -webkit-backdrop-filter: blur(12px);
     backdrop-filter: blur(12px);
     border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1),
-        inset 0 1px 0 rgba(255, 255, 255, 0.5);
-    font-size: 14px;
-    font-weight: bold;
+    box-shadow: 0 4px 24px 0 rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.295);
 }
 
 #testUI {
@@ -76,6 +85,6 @@ body {
 }
 
 .stats canvas {
-    transform: scale(2);
+    transform: scale(1.3);
     transform-origin: top left;
 }
