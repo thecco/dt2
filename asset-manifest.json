@@ -1,11 +1,11 @@
 {
   "files": {
-    "main.css": "/static/css/main.2b6de980.css",
-    "main.js": "/static/js/main.830a45fc.js",
-    "index.html": "/index.html"
+    "main.css": "/thecco/dt2/static/css/main.2b6de980.css",
+    "main.js": "/thecco/dt2/static/js/main.5315712f.js",
+    "index.html": "/thecco/dt2/index.html"
   },
   "entrypoints": [
     "static/css/main.2b6de980.css",
-    "static/js/main.830a45fc.js"
+    "static/js/main.5315712f.js"
   ]
 }
