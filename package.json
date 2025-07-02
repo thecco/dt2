@@ -2,7 +2,7 @@
   "name": "dt",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://github.com/thecco/dt2",
+  "homepage": "https://thecco.github.io/dt2/",
   "dependencies": {
     "@react-three/drei": "^10.3.0",
     "@react-three/fiber": "^9.1.2",
