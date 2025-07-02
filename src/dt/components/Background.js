@@ -4,10 +4,9 @@ export default function Background({ preset, color }) {
     return (
         <>
             <Environment preset={preset} background backgroundBlurriness={1} />
-            <fog attach="fog" args={[color, 8, 10]} />
+            <fog attach="fog" args={[color, 15, 20]} />
             <mesh
                 position={[0, 0, 0]}
-                scale={[0.1, 0.1, 0.1]}
                 rotation={[-Math.PI / 2, 0, Math.PI]}
                 receiveShadow  >
                 <planeGeometry args={[70, 70]} />

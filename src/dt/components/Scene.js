@@ -1,45 +1,39 @@
-import { Suspense, useRef } from 'react'
+import { Suspense, useState } from 'react'
 import { Canvas } from "@react-three/fiber"
-import { PresentationControls, Stats, Html } from '@react-three/drei';
-import AnimatedFemale from './models/AnimatedFemale';
-import { Stage } from './Stage';
+import { Stats, Preload, Html } from '@react-three/drei';
+import MainRenderer from './models/MainRenderer';
 import Background from './Background';
 
 export function Scene() {
-    const modelRef = useRef();
+    const [targetName, setTargetName] = useState(null);
 
     return (
         <div style={{ width: '100%', height: '100%' }}>
-            <Canvas shadows dpr={[1, 2]} camera={{ position: [0, 2, 5], target: [0, 15, 0], fov: 20 }} style={{ touchAction: 'none', width: '100%', height: '100%' }}>
+            <Canvas shadows dpr={[1, 2]} camera={{ position: [0, 0.82, 7.07], fov: 20 }} style={{ touchAction: 'none', width: '100%', height: '100%' }}>
                 <Suspense fallback={null}>
                     <Background preset="sunset" color={'#a3b2c8'} />
-
-                    <Stage>
-                        <PresentationControls
-                            global
-                            speed={2.5}
-                            polar={[0, 0]}
-                            config={{ mass: 2, tension: 400 }}
-                            snap={false}>
-
-                            <AnimatedFemale ref={modelRef} />
-                        </PresentationControls>
-                    </Stage>
-
-                    <Html position={[0.3, 1.3, 1]}>
-                        <div className="annotation">
-                            심장 <span className='outlineText' style={{ color: 'red' }}>32.6</span> <span style={{ fontSize: '1.5em' }}>😮</span>
-                        </div>
-                    </Html>
-
-                    <Html position={[-0.55, 0.8, 1]}>
-                        <div className="annotation">
-                            대장  <span className='outlineText' style={{ color: '#00ff2a' }}>87.3</span> <span style={{ fontSize: '1.5em' }}>😊</span>
-                        </div>
-                    </Html>
+                    <MainRenderer targetName={targetName} setTargetName={setTargetName} />
                 </Suspense>
+
                 <Stats className="stats" />
+                <Preload all />
             </Canvas>
+
+            {targetName && <div style={{
+                position: 'absolute', // 부모 relative에 대해 절대 위치
+                top: '20px',
+                left: '20px',
+                backgroundColor: 'rgba(0, 0, 0, 0.7)', // 배경색으로 가시성 확보
+                color: 'white',
+                padding: '10px',
+                borderRadius: '5px',
+                zIndex: 2 // Canvas (zIndex: 1)보다 높게 설정하여 위에 표시
+            }}>
+                <button onClick={() => setTargetName(null)}>
+                    &lt; 뒤로
+                </button>
+            </div>
+            }
         </div >
     );
 }

@@ -1,7 +1,7 @@
 import { useRef, useLayoutEffect, useMemo } from 'react';
 import { Html } from '@react-three/drei';
 
-export default function Billboard({ scene, boneName, offset = [0, 0, 0], children }) {
+export default function Billboard({ scene, boneName, offset = [0, 0, 0], children, ...props }) {
     const groupRef = useRef();
     // eslint-disable-next-line
     const bone = useMemo(() => scene.getObjectByName(boneName), [boneName]);
@@ -20,5 +20,5 @@ export default function Billboard({ scene, boneName, offset = [0, 0, 0], childre
         // eslint-disable-next-line
     }, [offset]);
 
-    return bone ? <group ref={groupRef}><Html center>{children}</Html></group> : null;
+    return bone ? <group ref={groupRef} {...props}><Html center>{children}</Html></group> : null;
 }
